@@ -21,13 +21,26 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const supabase=createClient('https://vkwculahmbovfgzhzkht.supabase.co','sb_publishable_Uo5-60ue2B7YT8p9UngXwA_kkzbnGQ_');
 const $=id=>document.getElementById(id);
 function message(id,text,error=false){$(id).textContent=text;$(id).classList.remove('hidden','error');if(error)$(id).classList.add('error');}
+
 function clear(id){$(id).classList.add('hidden');}
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.id==='openStaffLogin'){history.replaceState(null,'',location.pathname+'?staff=1');showOnly('staffLogin');loadStaffOutlets().catch(err=>message('staffLoginMsg',err.message,true));}
+ if(b.id==='forgotBtn'){e.preventDefault();const email=$('email').value.trim();if(!email){message('loginMsg','Enter your owner email first.',true);return;}b.disabled=true;try{const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/'});if(error)throw error;message('loginMsg','Password reset email requested. Check Inbox and Spam.');}catch(err){message('loginMsg',err.message||'Could not request password reset.',true);}finally{b.disabled=false;}}
+ if(b.id==='backOwnerLogin'){history.replaceState(null,'',location.pathname);showOnly('login');}
+});
+document.addEventListener('submit',async e=>{
+ if(e.target.id!=='loginForm')return;e.preventDefault();const b=$('loginBtn');b.disabled=true;clear('loginMsg');
+ try{const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;showApp(data.user);}
+ catch(err){message('loginMsg',err.message||'Sign-in failed. Check your connection and try again.',true);}
+ finally{b.disabled=false;}
+},true);
 function showOnly(id){['login','reset','app','staffLogin','staffHome'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
 function showApp(user){showOnly('app');$('logout').classList.remove('hidden');$('who').textContent=user.email||'';loadOutlets();}
 async function loadOutlets(){ $('outlets').innerHTML='<div class="muted">Loading…</div>'; const {data,error}=await supabase.rpc('aven_owner_list_outlets'); if(error){$('outlets').textContent='Could not load outlets: '+error.message;message('appMsg',error.message,true);return;} $('count').textContent=data.length; $('outlets').innerHTML=data.length?data.map(o=>'<div class="row"><div><strong>'+escapeHtml(o.name)+'</strong><div class="small muted">'+escapeHtml(o.code)+(o.address?' · '+escapeHtml(o.address):'')+'</div></div><span class="pill">'+escapeHtml(o.status)+'</span></div>').join(''):'<div class="muted" style="padding:22px 0">No outlets yet. Create your first outlet below.</div>';clear('appMsg');}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-$('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginBtn').disabled=true;clear('loginMsg');const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});$('loginBtn').disabled=false;if(error){message('loginMsg',error.message,true);return;}showApp(data.user);});
-$('forgotBtn').addEventListener('click',async()=>{const email=$('email').value.trim();if(!email){message('loginMsg','Enter your owner email first.',true);return;}$('forgotBtn').disabled=true;const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/'});$('forgotBtn').disabled=false;if(error){message('loginMsg',error.message,true);return;}message('loginMsg','Password reset email requested. Check Inbox and Spam.');});
+
+
 $('resetForm').addEventListener('submit',async e=>{e.preventDefault();const p=$('newPassword').value,c=$('confirmPassword').value;if(p.length<10){message('resetMsg','Use at least 10 characters.',true);return;}if(p!==c){message('resetMsg','Passwords do not match.',true);return;}$('savePasswordBtn').disabled=true;const {data,error}=await supabase.auth.updateUser({password:p});$('savePasswordBtn').disabled=false;if(error){message('resetMsg',error.message,true);return;}message('resetMsg','Password updated. You can now sign in.');await supabase.auth.signOut();$('logout').classList.add('hidden');$('who').textContent='';setTimeout(()=>showOnly('login'),1200);});
 $('logout').addEventListener('click',async()=>{await supabase.auth.signOut();$('logout').classList.add('hidden');$('who').textContent='';showOnly('login');});
 $('refresh').addEventListener('click',loadOutlets);
@@ -81,8 +94,8 @@ async function loadStaffOutlets(){
  if(error){sel.innerHTML='<option value="">Could not load outlets</option>';message('staffLoginMsg',error.message,true);return;}
  sel.innerHTML='<option value="">Select outlet</option>'+(data||[]).map(o=>'<option value="'+o.id+'">'+escapeHtml(o.name)+' · '+escapeHtml(o.code)+'</option>').join('');
 }
-$('openStaffLogin').addEventListener('click',()=>{history.replaceState(null,'',location.pathname+'?staff=1');showOnly('staffLogin');loadStaffOutlets();});
-$('backOwnerLogin').addEventListener('click',()=>{history.replaceState(null,'',location.pathname);showOnly('login');});
+
+
 $('loadStaffEmployees').addEventListener('click',async()=>{
  clear('staffLoginMsg');
  const outlet=$('staffOutlet').value,pin=$('staffOutletPin').value;
