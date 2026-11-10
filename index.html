@@ -85,7 +85,8 @@ async function loadBillRecords(){try{fillRecordOutlets();const args=rangeArgs('r
  }catch(e){message('recordsMsg',e.message,true);}}
 async function loadShiftReports(){try{fillRecordOutlets();const args=rangeArgs('reports');$('reportsMsg').classList.add('hidden');$('shiftRecords').textContent='Loading…';const {data,error}=await supabase.rpc('aven_owner_shift_reports',{p_outlet_id:$('reportsOutlet').value||null,...args});if(error)throw error;const rows=data||[];$('shiftRecords').innerHTML=rows.length?rows.map(s=>'<div class="itemline"><div class="row"><div><strong>'+escapeHtml(s.employee_name)+'</strong><div class="small muted">'+escapeHtml(s.outlet_name)+' · '+new Date(s.opened_at).toLocaleString('en-IN')+'</div><div class="small">'+escapeHtml(s.status)+(s.closed_at?' · Closed '+new Date(s.closed_at).toLocaleString('en-IN'):'')+'</div></div><strong>'+(s.variance_paise===null?'Open':money(s.variance_paise))+'</strong></div><div class="small">Opening '+money(s.opening_cash_paise)+' · Cash sales '+money(s.cash_sales_paise)+' · Refunds '+money(s.cash_refunds_paise)+'</div><div class="small">Expected '+(s.expected_cash_paise===null?'—':money(s.expected_cash_paise))+' · Counted '+(s.closing_cash_paise===null?'—':money(s.closing_cash_paise))+'</div><div class="small muted">'+escapeHtml(s.notes||'')+'</div></div>').join(''):'No shifts found for this period.';}catch(e){message('reportsMsg',e.message,true);}}
 $('recordsRefresh').addEventListener('click',loadBillRecords);$('reportsRefresh').addEventListener('click',loadShiftReports);
-\n// Staff sign-in and server-backed session lifecycle
+
+// Staff sign-in and server-backed session lifecycle
 const staffTokenKey='aven_staff_session_v1';
 let staffOutletEmployees=[];
 async function loadStaffOutlets(){
