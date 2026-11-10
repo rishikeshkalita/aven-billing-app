@@ -92,10 +92,22 @@ function receiptEscape(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&am
 function offerReceipt(messageId,r){
  const host=$(messageId);host.classList.remove('hidden','error');
  const paper=localStorage.getItem('avenReceiptWidth')||'80';
- host.innerHTML='<div><strong>Bill #'+receiptEscape(r.billNumber)+' created</strong> · '+receiptEscape(money(r.total))+' · '+receiptEscape(r.status)+'</div><div class="actions" style="margin-top:8px"><label style="margin:0">Paper width <select data-receipt-width style="width:auto;min-width:100px"><option value="80" '+(paper==='80'?'selected':'')+'>80 mm</option><option value="58" '+(paper==='58'?'selected':'')+'>58 mm</option></select></label><button type="button" class="secondary" data-print-receipt>Print receipt</button></div><details style="margin-top:10px;font-size:13px;color:var(--muted)"><summary style="cursor:pointer;font-weight:700;color:var(--green)">Thermal printer setup help</summary><p><b>Android tablet:</b> Pair the printer in Android Bluetooth settings. Install a compatible ESC/POS print service such as RawBT, then choose that service from the Android print screen after tapping Print receipt. Chrome on Android does not print directly to Bluetooth Classic printers.</p><p><b>Windows laptop:</b> Connect by USB, install the printer driver, set it as the default printer, then use Print receipt. Bluetooth requires the printer manufacturer driver/service.</p><p><b>Important:</b> AVEN currently sends a formatted browser print job. Direct one-tap ESC/POS Bluetooth printing is not enabled yet. Before buying a Bluetooth model, ask the seller to confirm Android compatibility and whether it uses Bluetooth Classic SPP or BLE. USB is the safer laptop connection.</p></details>';
+ const native=!!(window.AvenPrinter&&typeof window.AvenPrinter.printReceipt==='function');
+ const configured=native&&window.AvenPrinter.isPrinterConfigured()==='true';
+ const auto=native&&configured&&window.AvenPrinter.getAutoPrintEnabled()==='true';
+ host.innerHTML='<div><strong>Bill #'+receiptEscape(r.billNumber)+' created</strong> · '+receiptEscape(money(r.total))+' · '+receiptEscape(r.status)+'</div><div class="actions" style="margin-top:8px"><label style="margin:0">Paper width <select data-receipt-width style="width:auto;min-width:100px"><option value="80" '+(paper==='80'?'selected':'')+'>80 mm</option><option value="58" '+(paper==='58'?'selected':'')+'>58 mm</option></select></label><button type="button" class="secondary" data-print-receipt>Print / Reprint receipt</button>'+(native?'<button type="button" class="secondary" data-printer-settings>Printer settings</button>':'')+'</div><div data-printer-status class="muted" style="font-size:12px;margin-top:7px">'+(auto?'Sending receipt to printer automatically…':(native?(configured?'Automatic printing is off.':'Connect a printer in the AVEN app to enable automatic printing.'):'Browser print is available on this device.'))+'</div>';
  const select=host.querySelector('[data-receipt-width]');select.onchange=()=>localStorage.setItem('avenReceiptWidth',select.value);
- host.querySelector('[data-print-receipt]').onclick=()=>printAvenReceipt(r,select.value);
+ if(native){
+   host.querySelector('[data-printer-settings]').onclick=()=>window.AvenPrinter.openPrinterSettings();
+   host.querySelector('[data-print-receipt]').onclick=()=>window.AvenPrinter.printReceipt(JSON.stringify({...r,paperWidth:select.value,automatic:false}));
+   if(auto)window.AvenPrinter.printReceipt(JSON.stringify({...r,paperWidth:paper,automatic:true}));
+ }else{
+   host.querySelector('[data-print-receipt]').onclick=()=>printAvenReceipt(r,select.value);
+ }
 }
+window.avenPrinterResult=function(ok,msg){
+ document.querySelectorAll('[data-printer-status]').forEach(el=>{el.textContent=msg;el.style.color=ok?'#006039':'#b42318';});
+};
 function printAvenReceipt(r,paperWidth='80'){
  const paper=paperWidth==='58'?58:80;
  const contentWidth=paper===58?50:72;
