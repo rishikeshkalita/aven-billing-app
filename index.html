@@ -207,7 +207,6 @@ async function staffLoadWorkspace(){
  if(m.error){$('staffMenu').textContent=m.error.message;$('staffMenuCount').textContent='—';return;}
  staffCatalog=m.data||[];$('staffMenuCount').textContent=String(staffCatalog.filter(x=>x.product_id).length);staffPosRender();
  $('staffMenu').innerHTML=staffCatalog.length?staffCatalog.map(p=>'<div class="metric"><strong>'+escapeHtml(p.product_name)+'</strong><div class="small muted">'+escapeHtml(p.category_name)+'</div><div style="font-weight:800;margin-top:8px">'+staffMoney(p.price_paise)+'</div><div class="small muted">Tax '+(Number(p.tax_rate_bps||0)/100)+'%</div></div>').join(''):'No active priced products are set up.';
-}
  const activityToday=new Date(),activityPrior=new Date(activityToday);activityPrior.setDate(activityPrior.getDate()-6);
  const iso=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*60000);return x.toISOString().slice(0,10);};
  if(!$('staffActivityFrom').value)$('staffActivityFrom').value=iso(activityPrior);
