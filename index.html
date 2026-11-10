@@ -103,6 +103,7 @@ async function restoreStaffSession(){
  $('staffWelcome').textContent='Welcome, '+data.employee_name;
  $('staffDetails').textContent=data.outlet_name+' · '+String(data.role).replaceAll('_',' ')+' · Session expires '+new Date(data.expires_at).toLocaleString('en-IN');
  showOnly('staffHome');$('logout').classList.add('hidden');$('who').textContent=data.employee_name;
+ await staffLoadWorkspace();
  return true;
 }
 $('staffLogout').addEventListener('click',async()=>{
