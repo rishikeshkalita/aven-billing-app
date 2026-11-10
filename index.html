@@ -5,7 +5,9 @@
  .tabBtn.active{background:var(--green);color:#fff}.metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}.metric .value{font-size:27px;font-weight:800;margin-top:8px}.metric .label{font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:800}.itemline{padding:12px 0;border-bottom:1px solid var(--line)}.itemline:last-child{border:0}select{font:inherit}</style></head><body>
 <header class="top"><div><div class="brand">AVEN</div><div class="tag">BUSINESS CONTROL</div></div><div class="actions"><span id="who" class="small muted"></span><button id="logout" class="secondary hidden">Sign out</button></div></header>
 <main class="wrap">
-<section id="login" class="panel" style="max-width:460px;margin:8vh auto"><div class="eyebrow">OWNER ACCESS</div><h1>Sign in to AVEN</h1><p class="muted">Use your AVEN owner account.</p><form id="loginForm"><div style="margin:16px 0"><label>Email</label><input id="email" type="email" value="avenindia@proton.me" autocomplete="username" required></div><div style="margin:16px 0"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginBtn" type="submit">Sign in</button></form><div id="loginMsg" class="notice hidden"></div><p><button id="forgotBtn" class="secondary" type="button">Send password reset email</button></p><p class="small muted">You will receive a secure password-reset link at your owner email.</p></section>
+<section id="login" class="panel" style="max-width:460px;margin:8vh auto"><div class="eyebrow">OWNER ACCESS</div><h1>Sign in to AVEN</h1><p class="muted">Use your AVEN owner account.</p><form id="loginForm"><div style="margin:16px 0"><label>Email</label><input id="email" type="email" value="avenindia@proton.me" autocomplete="username" required></div><div style="margin:16px 0"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginBtn" type="submit">Sign in</button></form><div id="loginMsg" class="notice hidden"></div><p><button id="forgotBtn" class="secondary" type="button">Send password reset email</button></p><p class="small muted">You will receive a secure password-reset link at your owner email.</p><p><button id="openStaffLogin" class="secondary" type="button">Staff login</button></p></section>
+<section id="staffLogin" class="panel hidden" style="max-width:460px;margin:8vh auto"><div class="eyebrow">STAFF ACCESS</div><h1>Outlet sign in</h1><p class="muted">Use your outlet access PIN and employee PIN.</p><form id="staffLoginForm"><div style="margin:16px 0"><label>Outlet</label><select id="staffOutlet" required style="width:100%;padding:12px;border:1px solid #d5ded8;border-radius:9px"><option value="">Loading outlets…</option></select></div><div style="margin:16px 0"><label>Outlet access PIN</label><input id="staffOutletPin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" required></div><div class="actions"><button id="loadStaffEmployees" class="secondary" type="button">Load employees</button></div><div style="margin:16px 0"><label>Employee</label><select id="staffEmployee" required style="width:100%;padding:12px;border:1px solid #d5ded8;border-radius:9px"><option value="">Load employees first</option></select></div><div style="margin:16px 0"><label>Employee PIN</label><input id="staffEmployeePin" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="current-password" required></div><button id="staffLoginBtn" type="submit">Sign in</button></form><div id="staffLoginMsg" class="notice hidden"></div><p><button id="backOwnerLogin" class="secondary" type="button">Owner login</button></p></section>
+<section id="staffHome" class="panel hidden" style="max-width:650px;margin:8vh auto"><div class="eyebrow">STAFF SESSION ACTIVE</div><h1 id="staffWelcome">Signed in</h1><p class="muted" id="staffDetails"></p><div class="notice">Your staff credentials have been verified. This wave completes staff sign-in and secure session handling. Staff billing, shifts and order operations are not yet enabled in this portal.</div><button id="staffLogout" class="secondary" type="button">Sign out</button></section>
 <section id="reset" class="panel hidden" style="max-width:460px;margin:8vh auto"><div class="eyebrow">ACCOUNT SECURITY</div><h1>Set a new password</h1><p class="muted">Choose a strong password for your AVEN owner account.</p><form id="resetForm"><div style="margin:16px 0"><label>New password</label><input id="newPassword" type="password" minlength="10" autocomplete="new-password" required></div><div style="margin:16px 0"><label>Confirm new password</label><input id="confirmPassword" type="password" minlength="10" autocomplete="new-password" required></div><button id="savePasswordBtn" type="submit">Save new password</button></form><div id="resetMsg" class="notice hidden"></div></section>
 <section id="app" class="hidden"><div class="hero"><div><div class="eyebrow">OWNER CONSOLE</div><h1>Outlet management</h1><div class="muted">Manage AVEN locations from one owner account.</div></div><div class="panel" style="margin:0;min-width:150px"><div class="small muted">TOTAL OUTLETS</div><div class="stat" id="count">0</div></div></div><div id="appMsg" class="notice hidden"></div><nav class="actions" style="margin:20px 0;gap:8px"><button class="secondary tabBtn" data-tab="overview">Overview</button><button class="secondary tabBtn" data-tab="outlets">Outlets & setup</button><button class="secondary tabBtn" data-tab="menu">Master menu</button><button class="secondary tabBtn" data-tab="team">Employees</button><button class="secondary tabBtn" data-tab="pos">Billing POS</button></nav><section id="tabOverview"><div class="grid" id="summaryCards"><div class="panel">Loading business summary…</div></div><div class="panel"><h2>Business snapshot</h2><p class="muted small">Live totals across all AVEN outlets. Sales are based on issued bills; received payments are shown separately.</p><div id="summaryNote" class="muted small">Refreshing…</div></div></section><section id="tabOutlets" class="hidden">
 <div class="panel"><div class="actions" style="justify-content:space-between"><div><h2 style="margin:0 0 5px">Your outlets</h2><div class="muted small">Outlet records belonging to AVEN.</div></div><button id="refresh" class="secondary">Refresh</button></div><div id="outlets" style="margin-top:12px"><div class="muted">Loading outlets…</div></div></div>
@@ -16,7 +18,7 @@ const supabase=createClient('https://vkwculahmbovfgzhzkht.supabase.co','sb_publi
 const $=id=>document.getElementById(id);
 function message(id,text,error=false){$(id).textContent=text;$(id).classList.remove('hidden','error');if(error)$(id).classList.add('error');}
 function clear(id){$(id).classList.add('hidden');}
-function showOnly(id){['login','reset','app'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
+function showOnly(id){['login','reset','app','staffLogin','staffHome'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
 function showApp(user){showOnly('app');$('logout').classList.remove('hidden');$('who').textContent=user.email||'';loadOutlets();}
 async function loadOutlets(){ $('outlets').innerHTML='<div class="muted">Loading…</div>'; const {data,error}=await supabase.rpc('aven_owner_list_outlets'); if(error){$('outlets').textContent='Could not load outlets: '+error.message;message('appMsg',error.message,true);return;} $('count').textContent=data.length; $('outlets').innerHTML=data.length?data.map(o=>'<div class="row"><div><strong>'+escapeHtml(o.name)+'</strong><div class="small muted">'+escapeHtml(o.code)+(o.address?' · '+escapeHtml(o.address):'')+'</div></div><span class="pill">'+escapeHtml(o.status)+'</span></div>').join(''):'<div class="muted" style="padding:22px 0">No outlets yet. Create your first outlet below.</div>';clear('appMsg');}
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -54,8 +56,60 @@ $('posDiscount').addEventListener('input',posTotals);$('posPaymentAmount').addEv
 $('checkoutBtn').addEventListener('click',async()=>{if(!posCart.length){message('posMsg','Add items first.',true);return;}if(!/^\d{6}$/.test($('posEmployeePin').value)){message('posMsg','Enter the employee 6-digit PIN.',true);return;}const t=posTotals(),amount=posPaise($('posPaymentAmount').value),payments=amount?[{method:$('posPaymentMethod').value,amount_paise:amount}]:[];$('checkoutBtn').disabled=true;const {data,error}=await supabase.rpc('aven_owner_create_bill',{p_outlet_id:$('posOutlet').value,p_employee_id:$('posEmployee').value,p_employee_pin:$('posEmployeePin').value,p_order_type:$('posOrderType').value,p_customer_name:$('posCustomer').value.trim()||null,p_customer_phone:$('posPhone').value.trim()||null,p_items:posCart.map(x=>({product_id:x.product_id,quantity:x.qty,is_custom_item:x.is_custom_item,item_name:x.name,unit_price_paise:x.price,tax_rate_bps:x.tax})),p_discount_percent:Number($('posDiscount').value||0),p_manager_employee_id:t.discount?($('posManager').value||null):null,p_manager_pin:t.discount?$('posManagerPin').value:null,p_payments:payments});$('checkoutBtn').disabled=false;if(error){message('posMsg',error.message,true);return;}message('posMsg','Bill #'+data.bill_number+' created · '+money(data.total_paise)+' · '+data.status);posCart=[];$('posEmployeePin').value='';$('posManagerPin').value='';$('posDiscount').value='0';$('posPaymentAmount').value='';posRender();});
 const originalLoadOutlets=loadOutlets;
 loadOutlets=async function(){await originalLoadOutlets();const {data,error}=await supabase.rpc('aven_owner_list_outlets');if(error)return;avenOutlets=data||[];$('employeeOutlet').innerHTML=avenOutlets.map(o=>'<option value="'+o.id+'">'+escapeHtml(o.name)+' · '+escapeHtml(o.code)+'</option>').join('');await fillPriceInputs();$('posOutlet').innerHTML=avenOutlets.map(o=>'<option value="'+o.id+'">'+escapeHtml(o.name)+' · '+escapeHtml(o.code)+'</option>').join('');await loadSummary();};
+
+// Staff sign-in and server-backed session lifecycle
+const staffTokenKey='aven_staff_session_v1';
+let staffOutletEmployees=[];
+async function loadStaffOutlets(){
+ const sel=$('staffOutlet');sel.innerHTML='<option value="">Loading outlets…</option>';
+ const {data,error}=await supabase.rpc('aven_public_list_outlets');
+ if(error){sel.innerHTML='<option value="">Could not load outlets</option>';message('staffLoginMsg',error.message,true);return;}
+ sel.innerHTML='<option value="">Select outlet</option>'+(data||[]).map(o=>'<option value="'+o.id+'">'+escapeHtml(o.name)+' · '+escapeHtml(o.code)+'</option>').join('');
+}
+$('openStaffLogin').addEventListener('click',()=>{history.replaceState(null,'',location.pathname+'?staff=1');showOnly('staffLogin');loadStaffOutlets();});
+$('backOwnerLogin').addEventListener('click',()=>{history.replaceState(null,'',location.pathname);showOnly('login');});
+$('loadStaffEmployees').addEventListener('click',async()=>{
+ clear('staffLoginMsg');
+ const outlet=$('staffOutlet').value,pin=$('staffOutletPin').value;
+ if(!outlet||!/^\d{6}$/.test(pin)){message('staffLoginMsg','Select an outlet and enter its 6-digit access PIN.',true);return;}
+ $('loadStaffEmployees').disabled=true;
+ const {data,error}=await supabase.rpc('aven_public_list_outlet_employees',{p_outlet_id:outlet,p_password:pin});
+ $('loadStaffEmployees').disabled=false;
+ if(error){$('staffEmployee').innerHTML='<option value="">Could not load employees</option>';message('staffLoginMsg',error.message,true);return;}
+ staffOutletEmployees=data||[];
+ $('staffEmployee').innerHTML='<option value="">Select employee</option>'+staffOutletEmployees.map(e=>'<option value="'+e.employee_id+'">'+escapeHtml(e.employee_name)+'</option>').join('');
+ if(!staffOutletEmployees.length)message('staffLoginMsg','No active employees are set up for this outlet.',true);
+});
+$('staffLoginForm').addEventListener('submit',async e=>{
+ e.preventDefault();clear('staffLoginMsg');
+ const outlet=$('staffOutlet').value,employee=$('staffEmployee').value,outletPin=$('staffOutletPin').value,employeePin=$('staffEmployeePin').value;
+ if(!outlet||!employee||!/^\d{6}$/.test(outletPin)||!/^\d{6}$/.test(employeePin)){message('staffLoginMsg','Complete all fields. Both PINs must be 6 digits.',true);return;}
+ $('staffLoginBtn').disabled=true;
+ const {data,error}=await supabase.rpc('aven_staff_create_session',{p_outlet_id:outlet,p_outlet_password:outletPin,p_employee_id:employee,p_employee_pin:employeePin});
+ $('staffLoginBtn').disabled=false;
+ if(error){message('staffLoginMsg',error.message,true);return;}
+ localStorage.setItem(staffTokenKey,data.token);
+ $('staffOutletPin').value='';$('staffEmployeePin').value='';
+ await restoreStaffSession();
+});
+async function restoreStaffSession(){
+ const token=localStorage.getItem(staffTokenKey);
+ if(!token)return false;
+ const {data,error}=await supabase.rpc('aven_staff_validate_session',{p_token:token});
+ if(error||!data){localStorage.removeItem(staffTokenKey);return false;}
+ $('staffWelcome').textContent='Welcome, '+data.employee_name;
+ $('staffDetails').textContent=data.outlet_name+' · '+String(data.role).replaceAll('_',' ')+' · Session expires '+new Date(data.expires_at).toLocaleString('en-IN');
+ showOnly('staffHome');$('logout').classList.add('hidden');$('who').textContent=data.employee_name;
+ return true;
+}
+$('staffLogout').addEventListener('click',async()=>{
+ const token=localStorage.getItem(staffTokenKey);
+ if(token)await supabase.rpc('aven_staff_revoke_session',{p_token:token});
+ localStorage.removeItem(staffTokenKey);$('who').textContent='';history.replaceState(null,'',location.pathname+'?staff=1');showOnly('staffLogin');loadStaffOutlets();
+});
+
 const recoveryQuery=new URLSearchParams(location.search);const recoveryHash=new URLSearchParams(location.hash.slice(1));const recoveryIntent=recoveryQuery.get('type')==='recovery'||recoveryHash.get('type')==='recovery'||recoveryQuery.has('code')||recoveryQuery.has('token_hash');
 supabase.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'||(recoveryIntent&&session)){showOnly('reset');$('logout').classList.add('hidden');}else if(session&&$('reset').classList.contains('hidden')){showApp(session.user);}});
 if(recoveryQuery.has('token_hash')&&recoveryQuery.get('type')==='recovery'){const {error}=await supabase.auth.verifyOtp({token_hash:recoveryQuery.get('token_hash'),type:'recovery'});if(error){showOnly('reset');message('resetMsg','This password-reset link is invalid or expired. Request a new link.',true);}}
-const {data:{session}}=await supabase.auth.getSession();if(recoveryIntent){showOnly('reset');$('logout').classList.add('hidden');if(!session&&!recoveryQuery.has('token_hash'))message('resetMsg','The reset link did not establish a recovery session. Request a new reset email and open its newest link in this browser.',true);}else if(session){showApp(session.user);}
+const {data:{session}}=await supabase.auth.getSession();if(recoveryIntent){showOnly('reset');$('logout').classList.add('hidden');if(!session&&!recoveryQuery.has('token_hash'))message('resetMsg','The reset link did not establish a recovery session. Request a new reset email and open its newest link in this browser.',true);}else if(session){showApp(session.user);}else if(recoveryQuery.get('staff')==='1'){if(!(await restoreStaffSession())){showOnly('staffLogin');await loadStaffOutlets();}}
 </script></body></html>
