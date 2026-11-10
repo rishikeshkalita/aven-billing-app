@@ -116,7 +116,44 @@ function printAvenReceipt(r,paperWidth='80'){
  const rows=r.items.map(x=>'<tr><td>'+receiptEscape(x.name)+' × '+receiptEscape(x.qty)+'</td><td style="text-align:right">'+receiptEscape(money(x.amount))+'</td></tr>').join('');
  const payments=r.payments.length?r.payments.map(p=>'<tr><td>'+receiptEscape(p.method.toUpperCase())+'</td><td style="text-align:right">'+receiptEscape(money(p.amount))+'</td></tr>').join(''):'<tr><td>Payment pending</td><td style="text-align:right">—</td></tr>';
  const receiptCss='<style>*{box-sizing:border-box}html,body{width:__W__mm;max-width:__W__mm;margin:0;padding:0;background:#fff;color:#111;font:12px Arial,sans-serif}body{padding:3mm}h1{text-align:center;font-size:21px;letter-spacing:2px;margin:0}p{text-align:center;margin:3px 0 12px;color:#444;font-size:10px}.meta{font-size:10px;line-height:1.55;border-top:1px dashed #777;border-bottom:1px dashed #777;padding:6px 0;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px}td{padding:3px 0;vertical-align:top}td:first-child{padding-right:4px}.total{font-weight:bold;font-size:14px;border-top:1px dashed #777;padding-top:7px}.thanks{text-align:center;margin-top:14px;font-size:10px}@page{size:__P__mm auto;margin:0}@media print{html,body{width:__W__mm;max-width:__W__mm;margin:0;padding:0}body{padding:3mm}}</style>'.replaceAll('__W__',String(contentWidth)).replace('__P__',String(paper));
- const html='<!doctype html><html><head><meta charset="utf-8"><title>AVEN Receipt #'+receiptEscape(r.billNumber)+'</title>'+receiptCss+'</head><body><h1>AVEN</h1><p>BUSINESS CONTROL · PAYMENT RECEIPT</p><div class="meta">Bill No: #'+receiptEscape(r.billNumber)+'<br>Date: '+receiptEscape(new Date(r.date).toLocaleString('en-IN'))+'<br>Outlet: '+receiptEscape(r.outlet)+'<br>Served by: '+receiptEscape(r.employee)+'<br>Order: '+receiptEscape(r.orderType)+(r.customer?'<br>Customer: '+receiptEscape(r.customer):'')+(r.phone?'<br>Phone: '+receiptEscape(r.phone):'')+'</div><table>'+rows+'</table><table><tr><td>Subtotal</td><td style="text-align:right">'+receiptEscape(money(r.subtotal))+'</td></tr><tr><td>Discount ('+receiptEscape(r.discountPercent)+'%)</td><td style="text-align:right">−'+receiptEscape(money(r.discount))+'</td></tr><tr><td>Tax</td><td style="text-align:right">'+receiptEscape(money(r.tax))+'</td></tr><tr class="total"><td>Total</td><td style="text-align:right">'+receiptEscape(money(r.total))+'</td></tr>'+payments+'</table><div class="meta">Amount due: '+receiptEscape(money(Math.max(0,r.total-r.paid)))+'<br>Change due: '+receiptEscape(money(r.change))+'</div><div class="thanks">Thank you for choosing AVEN.</div></body></html>';
+ const html='<!doctype html><html><head><meta charset="utf-8"><title>AVEN Receipt #'+receiptEscape(r.billNumber)+'</title>'+receiptCss+'</head><body><h1>AVEN</h1><p>BUSINESS CONTROL · PAYMENT RECEIPT</p><div class="meta">Bill No: #'+receiptEscape(r.billNumber)+'<br>Date: '+receiptEscape(new Date(r.date).toLocaleString('en-IN'))+'<br>Outlet: '+receiptEscape(r.outlet)+'<br>Served by: '+receiptEscape(r.employee)+'<br>Order: '+receiptEscape(r.orderType)+(r.customer?'<br>Customer: '+receiptEscape(r.customer):'')+(r.phone?'<br>Phone: '+receiptEscape(r.phone):'')+'</div><table>'+rows+'</table><table><tr><td>Subtotal</td><td style="text-align:right">'+receiptEscape(money(r.subtotal))+'</td></tr><tr><td>Discount ('+receiptEscape(r.discountPercent)+'%)</td><td style="text-align:right">−'+receiptEscape(money(r.discount))+'</td></tr><tr><td>Tax</td><td style="text-align:right">'+receiptEscape(money(r.tax))+'</td></tr><tr class="total"><td>Total</td><td style="text-align:right">'+receiptEscape(money(r.total))+'</td></tr>'+payments+'</table><div class="meta">Amount due: '+receiptEscape(money(Math.max(0,r.total-r.paid)))+'<br>Change due: '+receiptEscape(money(r.change))+'</div><div class="thanks">Thank you for choosing AVEN.</div><style>
+#avenUpdateNotice{position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;display:none;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;background:#123d2a;color:#fff;border-radius:12px;box-shadow:0 8px 28px #0003;font:14px system-ui,sans-serif}
+#avenUpdateNotice button{background:#fff;color:#123d2a;white-space:nowrap}
+@media(max-width:480px){#avenUpdateNotice{align-items:flex-start;flex-direction:column}#avenUpdateNotice button{width:100%}}
+</style>
+<div id="avenUpdateNotice" role="status" aria-live="polite"><span>A new AVEN update is available.</span><button id="avenApplyUpdate" type="button">Reload app</button></div>
+<script>
+(function(){
+  if(window.__avenUpdateCheckerInstalled)return;
+  window.__avenUpdateCheckerInstalled=true;
+  var notice=document.getElementById('avenUpdateNotice');
+  var apply=document.getElementById('avenApplyUpdate');
+  if(!notice||!apply)return;
+  var baseline=null,updateFound=false,checking=false;
+  async function checkForUpdate(){
+    if(checking||updateFound)return;
+    checking=true;
+    try{
+      var response=await fetch(location.pathname+'?__aven_version_check='+Date.now(),{method:'HEAD',cache:'no-store',credentials:'same-origin'});
+      if(!response.ok)throw new Error('Version check failed');
+      var current=response.headers.get('etag')||response.headers.get('last-modified')||response.headers.get('x-vercel-id');
+      if(current){
+        if(baseline===null)baseline=current;
+        else if(current!==baseline){updateFound=true;notice.style.display='flex';}
+      }
+    }catch(e){}finally{checking=false;}
+  }
+  apply.addEventListener('click',function(){
+    apply.disabled=true;apply.textContent='Reloading…';
+    var url=new URL(location.href);url.searchParams.set('__aven_refresh',String(Date.now()));
+    location.replace(url.toString());
+  });
+  checkForUpdate();
+  window.setInterval(checkForUpdate,60000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)checkForUpdate();});
+})();
+</script>
+</body></html>';
  w.document.open();w.document.write(html);w.document.close();w.onload=()=>w.print();
 }
 function clear(id){$(id).classList.add('hidden');}
