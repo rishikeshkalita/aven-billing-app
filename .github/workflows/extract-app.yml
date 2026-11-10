@@ -1,0 +1,35 @@
+name: Extract AVEN app source
+on:
+  push:
+    branches: [main]
+    paths:
+      - '*.zip'
+      - '.github/workflows/extract-app.yml'
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Extract uploaded app ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          zip_file="$(find . -maxdepth 1 -type f -name '*.zip' -print -quit)"
+          test -n "$zip_file"
+          mkdir -p /tmp/aven-extract
+          unzip -q "$zip_file" -d /tmp/aven-extract
+          app_file="$(find /tmp/aven-extract -type f -name 'index.html' -print -quit)"
+          test -n "$app_file"
+          cp "$app_file" ./index.html
+      - name: Commit extracted app entry point
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Extract AVEN app entry point from ZIP"
+            git push
+          fi
