@@ -7,7 +7,10 @@
 <main class="wrap">
 <section id="login" class="panel" style="max-width:460px;margin:8vh auto"><div class="eyebrow">OWNER ACCESS</div><h1>Sign in to AVEN</h1><p class="muted">Use your AVEN owner account.</p><form id="loginForm"><div style="margin:16px 0"><label>Email</label><input id="email" type="email" value="avenindia@proton.me" autocomplete="username" required></div><div style="margin:16px 0"><label>Password</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginBtn" type="submit">Sign in</button></form><div id="loginMsg" class="notice hidden"></div><p><button id="forgotBtn" class="secondary" type="button">Send password reset email</button></p><p class="small muted">You will receive a secure password-reset link at your owner email.</p><p><button id="openStaffLogin" class="secondary" type="button">Staff login</button></p></section>
 <section id="staffLogin" class="panel hidden" style="max-width:460px;margin:8vh auto"><div class="eyebrow">STAFF ACCESS</div><h1>Outlet sign in</h1><p class="muted">Use your outlet access PIN and employee PIN.</p><form id="staffLoginForm"><div style="margin:16px 0"><label>Outlet</label><select id="staffOutlet" required style="width:100%;padding:12px;border:1px solid #d5ded8;border-radius:9px"><option value="">Loading outlets…</option></select></div><div style="margin:16px 0"><label>Outlet access PIN</label><input id="staffOutletPin" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" required></div><div class="actions"><button id="loadStaffEmployees" class="secondary" type="button">Load employees</button></div><div style="margin:16px 0"><label>Employee</label><select id="staffEmployee" required style="width:100%;padding:12px;border:1px solid #d5ded8;border-radius:9px"><option value="">Load employees first</option></select></div><div style="margin:16px 0"><label>Employee PIN</label><input id="staffEmployeePin" type="password" inputmode="numeric" pattern="[0-9]{6}" minlength="6" maxlength="6" autocomplete="current-password" required></div><button id="staffLoginBtn" type="submit">Sign in</button></form><div id="staffLoginMsg" class="notice hidden"></div><p><button id="backOwnerLogin" class="secondary" type="button">Owner login</button></p></section>
-<section id="staffHome" class="panel hidden" style="max-width:650px;margin:8vh auto"><div class="eyebrow">STAFF SESSION ACTIVE</div><h1 id="staffWelcome">Signed in</h1><p class="muted" id="staffDetails"></p><div class="notice">Your staff credentials have been verified. This wave completes staff sign-in and secure session handling. Staff billing, shifts and order operations are not yet enabled in this portal.</div><button id="staffLogout" class="secondary" type="button">Sign out</button></section>
+<section id="staffHome" class="panel hidden" style="max-width:650px;margin:8vh auto"><div class="eyebrow">STAFF SESSION ACTIVE</div><h1 id="staffWelcome">Signed in</h1><p class="muted" id="staffDetails"></p><div class="grid"><div class="metric"><div class="label">SHIFT STATUS</div><div class="value" id="staffShiftStatus">Loading…</div><div class="small muted" id="staffShiftMeta"></div></div><div class="metric"><div class="label">OUTLET MENU</div><div class="value" id="staffMenuCount">—</div><div class="small muted">Active priced products</div></div></div>
+<div class="panel"><h2>Shift management</h2><div id="staffShiftMessage" class="notice hidden"></div><div id="staffShiftStart" class="actions"><label style="min-width:100%">Opening cash (₹)</label><input id="staffOpeningCash" type="number" min="0" step="0.01" value="0" style="max-width:220px"><button id="staffStartShift" type="button">Start shift</button></div><div id="staffShiftClose" class="hidden"><div class="grid"><div><label>Closing cash counted (₹)</label><input id="staffClosingCash" type="number" min="0" step="0.01"></div><div><label>Employee PIN</label><input id="staffClosePin" type="password" inputmode="numeric" maxlength="6"></div></div><label style="margin-top:12px">Closing notes (optional)</label><input id="staffCloseNotes" type="text" maxlength="500" placeholder="Cash variance or handover notes"><p><button id="staffCloseShift" type="button">Close shift</button></p></div></div>
+<div class="panel"><div class="actions" style="justify-content:space-between"><h2>Outlet menu</h2><button id="staffRefreshMenu" class="secondary" type="button">Refresh</button></div><p class="muted small">Current active products and outlet prices.</p><div id="staffMenu" class="grid">Loading menu…</div></div>
+<div class="actions"><button id="staffLogout" class="secondary" type="button">Sign out</button></div></section>
 <section id="reset" class="panel hidden" style="max-width:460px;margin:8vh auto"><div class="eyebrow">ACCOUNT SECURITY</div><h1>Set a new password</h1><p class="muted">Choose a strong password for your AVEN owner account.</p><form id="resetForm"><div style="margin:16px 0"><label>New password</label><input id="newPassword" type="password" minlength="10" autocomplete="new-password" required></div><div style="margin:16px 0"><label>Confirm new password</label><input id="confirmPassword" type="password" minlength="10" autocomplete="new-password" required></div><button id="savePasswordBtn" type="submit">Save new password</button></form><div id="resetMsg" class="notice hidden"></div></section>
 <section id="app" class="hidden"><div class="hero"><div><div class="eyebrow">OWNER CONSOLE</div><h1>Outlet management</h1><div class="muted">Manage AVEN locations from one owner account.</div></div><div class="panel" style="margin:0;min-width:150px"><div class="small muted">TOTAL OUTLETS</div><div class="stat" id="count">0</div></div></div><div id="appMsg" class="notice hidden"></div><nav class="actions" style="margin:20px 0;gap:8px"><button class="secondary tabBtn" data-tab="overview">Overview</button><button class="secondary tabBtn" data-tab="outlets">Outlets & setup</button><button class="secondary tabBtn" data-tab="menu">Master menu</button><button class="secondary tabBtn" data-tab="team">Employees</button><button class="secondary tabBtn" data-tab="pos">Billing POS</button></nav><section id="tabOverview"><div class="grid" id="summaryCards"><div class="panel">Loading business summary…</div></div><div class="panel"><h2>Business snapshot</h2><p class="muted small">Live totals across all AVEN outlets. Sales are based on issued bills; received payments are shown separately.</p><div id="summaryNote" class="muted small">Refreshing…</div></div></section><section id="tabOutlets" class="hidden">
 <div class="panel"><div class="actions" style="justify-content:space-between"><div><h2 style="margin:0 0 5px">Your outlets</h2><div class="muted small">Outlet records belonging to AVEN.</div></div><button id="refresh" class="secondary">Refresh</button></div><div id="outlets" style="margin-top:12px"><div class="muted">Loading outlets…</div></div></div>
@@ -107,6 +110,46 @@ $('staffLogout').addEventListener('click',async()=>{
  if(token)await supabase.rpc('aven_staff_revoke_session',{p_token:token});
  localStorage.removeItem(staffTokenKey);$('who').textContent='';history.replaceState(null,'',location.pathname+'?staff=1');showOnly('staffLogin');loadStaffOutlets();
 });
+
+
+// Staff shift and outlet menu workspace
+let staffShift=null,staffCatalog=[];
+const staffMoney=p=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'}).format(Number(p||0)/100);
+async function staffLoadWorkspace(){
+ const token=localStorage.getItem(staffTokenKey); if(!token)return;
+ const [s,m]=await Promise.all([supabase.rpc('aven_staff_shift_status',{p_token:token}),supabase.rpc('aven_staff_pos_catalog',{p_token:token})]);
+ if(s.error){message('staffShiftMessage',s.error.message,true);return;}
+ staffShift=s.data?.open?s.data:null;
+ $('staffShiftStatus').textContent=staffShift?'OPEN':'CLOSED';
+ $('staffShiftMeta').textContent=staffShift?'Opened '+new Date(staffShift.opened_at).toLocaleString('en-IN')+' · Opening cash '+staffMoney(staffShift.opening_cash_paise):'No active shift';
+ $('staffShiftStart').classList.toggle('hidden',!!staffShift);
+ $('staffShiftClose').classList.toggle('hidden',!staffShift);
+ if(m.error){$('staffMenu').textContent=m.error.message;$('staffMenuCount').textContent='—';return;}
+ staffCatalog=m.data||[];$('staffMenuCount').textContent=String(staffCatalog.filter(x=>x.product_id).length);
+ $('staffMenu').innerHTML=staffCatalog.length?staffCatalog.map(p=>'<div class="metric"><strong>'+escapeHtml(p.product_name)+'</strong><div class="small muted">'+escapeHtml(p.category_name)+'</div><div style="font-weight:800;margin-top:8px">'+staffMoney(p.price_paise)+'</div><div class="small muted">Tax '+(Number(p.tax_rate_bps||0)/100)+'%</div></div>').join(''):'No active priced products are set up.';
+}
+$('staffStartShift').addEventListener('click',async()=>{
+ const token=localStorage.getItem(staffTokenKey),cash=Math.round(Number($('staffOpeningCash').value||0)*100);
+ if(!Number.isFinite(cash)||cash<0){message('staffShiftMessage','Enter a valid opening cash amount.',true);return;}
+ $('staffStartShift').disabled=true;
+ const {data,error}=await supabase.rpc('aven_staff_start_shift',{p_token:token,p_employee_pin:prompt('Enter your 6-digit employee PIN to start the shift')||'',p_opening_cash_paise:cash});
+ $('staffStartShift').disabled=false;
+ if(error){message('staffShiftMessage',error.message,true);return;}
+ if(!data?.ok){message('staffShiftMessage',data?.error||'Could not start shift.',true);return;}
+ message('staffShiftMessage','Shift started.');await staffLoadWorkspace();
+});
+$('staffCloseShift').addEventListener('click',async()=>{
+ const cash=Math.round(Number($('staffClosingCash').value)*100),pin=$('staffClosePin').value;
+ if(!Number.isFinite(cash)||cash<0||!/^\\d{6}$/.test(pin)){message('staffShiftMessage','Enter closing cash and your 6-digit employee PIN.',true);return;}
+ $('staffCloseShift').disabled=true;
+ const {data,error}=await supabase.rpc('aven_staff_close_shift',{p_token:localStorage.getItem(staffTokenKey),p_employee_pin:pin,p_closing_cash_paise:cash,p_notes:$('staffCloseNotes').value.trim()||null});
+ $('staffCloseShift').disabled=false;
+ if(error){message('staffShiftMessage',error.message,true);return;}
+ $('staffClosePin').value='';
+ message('staffShiftMessage','Shift closed. Expected cash: '+staffMoney(data.expected_cash_paise)+' · Variance: '+staffMoney(data.variance_paise));
+ await staffLoadWorkspace();
+});
+$('staffRefreshMenu').addEventListener('click',staffLoadWorkspace);
 
 const recoveryQuery=new URLSearchParams(location.search);const recoveryHash=new URLSearchParams(location.hash.slice(1));const recoveryIntent=recoveryQuery.get('type')==='recovery'||recoveryHash.get('type')==='recovery'||recoveryQuery.has('code')||recoveryQuery.has('token_hash');
 supabase.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'||(recoveryIntent&&session)){showOnly('reset');$('logout').classList.add('hidden');}else if(session&&$('reset').classList.contains('hidden')){showApp(session.user);}});
